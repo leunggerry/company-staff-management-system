@@ -39,32 +39,33 @@ function init() {
 }
 
 function askUserAction() {
-  inquirer.prompt(openingQuestions).then((answer) => {
-    //console.log(userAction);
+  inquirer
+    .prompt(openingQuestions)
+    .then((answer) => {
+      //console.log(userAction);
 
-    switch (answer.userAction) {
-      case "View All Roles":
-        roles.getAllRoles();
-        return askUserAction();
-        break;
-      case "Update Employee Role":
-      case "Add Role":
-        roles.addARole().then(askUserAction);
-        break;
-      case "View All Departments":
-        department.getAllDepartments().then(askUserAction);
-        console.log("\n");
-        break;
-      case "Add Department":
-      case "View All Employees":
-        employee.getAllEmployees().then(askUserAction);
-        break;
-      case "Quit":
-      default:
-        return;
-    }
-  });
+      switch (answer.userAction) {
+        case "View All Roles":
+          return roles.getAllRoles();
+        // return askUserAction();
+        case "Update Employee Role":
+        case "Add Role":
+          return roles.addARole();
+        // return askUserAction;
+        case "View All Departments":
+          return department.getAllDepartments();
+
+        case "Add Department":
+        case "View All Employees":
+          return employee.getAllEmployees();
+        case "Quit":
+        default:
+          return;
+      }
+    })
+    .then(askUserAction);
 }
+
 /** Main Function
  *************************************************************************************************/
 init();

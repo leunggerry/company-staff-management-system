@@ -26,9 +26,9 @@ const roleQuestions = [
 /** Utility functions
  *************************************************************************************************/
 async function addARole() {
-  const roleAnswers = await inquirer.prompt(roleQuestions);
-
-  sqlAddRole(roleAnswers.newRole, roleAnswers.salary, roleAnswers.department);
+  return inquirer.prompt(roleQuestions).then((roleAnswers) => {
+    sqlAddRole(roleAnswers.newRole, roleAnswers.salary, roleAnswers.department);
+  });
 }
 /** SQL Functions
  *************************************************************************************************/
@@ -37,15 +37,16 @@ async function addARole() {
  * @returns
  */
 function getAllRoles() {
-  return db.query("SELECT * FROM roles", function (err, results) {
+  db.query("SELECT * FROM roles", function (err, results) {
     console.log("\n");
     console.table("Roles", results);
-    console.log("\n");
+    console.log("\n\n");
   });
+  return true;
 }
 
-async function sqlAddRole(role, salary, department) {
-  await db.query(
+function sqlAddRole(role, salary, department) {
+  return db.query(
     "INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)",
     [role, salary, department],
     (err, result) => {
@@ -53,6 +54,8 @@ async function sqlAddRole(role, salary, department) {
         console.log("Failed to add role");
         return;
       }
+      console.log("Role added " + result);
+      return;
     }
   );
 }
