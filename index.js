@@ -225,7 +225,6 @@ function updateEmployeeRole() {
     // get all roles and create array for user view
     var rolesArr;
     db.query("SELECT id, title FROM roles", function (err, results) {
-      console.log(results);
       rolesArr = results.map((role) => {
         var roleInfo = {
           name: role.title,
