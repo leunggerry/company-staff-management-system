@@ -76,36 +76,52 @@ function getAllRoles() {
 }
 
 function addARole() {
-  const roleQuestions = [
-    {
-      type: "input",
-      name: "newRole",
-      message: "What is the new role you would like to add?",
-    },
-    {
-      type: "input",
-      name: "salary",
-      message: "What is the salary for this role?",
-    },
-    {
-      type: "input",
-      name: "department",
-      message: "What department does this role belong to?",
-    },
-  ];
+  //get department_id
+  db.query("SELECT id, name FROM departments", function (err, results) {
+    var departmentsArr = results.map((department) => {
+      // console.log(role);
+      var departmentInfo = {
+        name: department.name,
+        value: department.id,
+      };
+      return departmentInfo;
+    });
+    //console.log(departmentsArr);
+    const roleQuestions = [
+      {
+        type: "input",
+        name: "newRole",
+        message: "What is the new role you would like to add?",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is the salary for this role?",
+      },
+      {
+        type: "list",
+        name: "departmentId",
+        message: "What department does this role belong to?",
+        choices: departmentsArr,
+      },
+    ];
 
-  inquirer.prompt(roleQuestions).then((roleAnswers) => {
-    const sqlQuery = "INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)";
-    const params = [roleAnswers.role, roleAnswers.salary, roleAnswers.department];
+    inquirer.prompt(roleQuestions).then((roleAnswers) => {
+      //console.log(roleAnswers);
+      const sqlQuery = "INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)";
+      const params = [roleAnswers.newRole, roleAnswers.salary, roleAnswers.departmentId];
 
-    //run query and call userAskAction when complete
-    db.query(sqlQuery, params, (err, result) => {
-      //log error if error
-      if (err) {
-        console.log("Failed to add role");
-      }
+      //run query and call userAskAction when complete
+      db.query(sqlQuery, params, (err, result) => {
+        //log error if error
+        if (err) {
+          console.log("Failed to add role " + err);
+        } else {
+          console.log("Role Added");
+        }
 
-      askUserAction();
+        askUserAction();
+      });
     });
   });
 }
