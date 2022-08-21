@@ -219,7 +219,7 @@ function updateEmployeeRole() {
       });
 
       //console.log(employeeArr);
-      console.log(rolesArr);
+      // console.log(rolesArr);
       const employeeUpdateQuestions = [
         {
           type: "list",
@@ -237,8 +237,8 @@ function updateEmployeeRole() {
         },
       ];
       inquirer.prompt(employeeUpdateQuestions).then((updateAnswers) => {
-        console.log(updateAnswers.employeeId);
-        console.log(updateAnswers.roleId);
+        // console.log(updateAnswers.employeeId);
+        // console.log(updateAnswers.roleId);
 
         db.query(
           "UPDATE employees SET role_id = ? WHERE id = ?",
