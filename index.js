@@ -3,11 +3,6 @@
 const inquirer = require("inquirer");
 const db = require("./db/connection");
 const cTable = require("console.table");
-//sql apis
-const department = require("./routes/apiRoutes/departmentSqlRoutes");
-const employee = require("./routes/apiRoutes/employeeSqlRoutes");
-//const { EMPLOYEE_UPDATE_QUESTIONS } = require("./routes/apiRoutes/employeeSqlRoutes");
-const roles = require("./routes/apiRoutes/rolesSqlRoutes");
 /** Global Constants
  *************************************************************************************************/
 const openingQuestions = [
@@ -125,8 +120,81 @@ function getAllEmployees() {
     askUserAction();
   });
 }
+function addAnEmployee() {
+  // get the roles and manager
+  db.query("SELECT id, title FROM roles", function (err, results) {
+    var rolesArr = results.map((role) => {
+      // console.log(role);
+      var roleInfo = {
+        name: role.title,
+        value: role.id,
+      };
+      return roleInfo;
+    });
+    // console.log(rolesArr);
 
-async function updateEmployeeRole() {
+    //get the employees to select the manager
+    db.query("SELECT id, first_name, last_name FROM employees", function (err, results) {
+      var employeeArr = results.map((employee) => {
+        var employeeInfo = {
+          name: `${employee.first_name} ${employee.last_name}`,
+          value: employee.id,
+        };
+        return employeeInfo;
+      });
+      // add option for no manager
+      employeeArr.push({ name: "No Mananger", value: null });
+
+      //question for the employpee info
+      const addEmployeeQuestions = [
+        {
+          type: "input",
+          name: "firstName",
+          message: "What is the first name of the employee?",
+        },
+        {
+          type: "input",
+          name: "lastName",
+          message: "What is the last name of the employee?",
+        },
+        {
+          type: "list",
+          name: "roleId",
+          message: "What is the role of the employee?",
+          choices: rolesArr,
+        },
+        {
+          type: "list",
+          name: "managerId",
+          message: "Who is the manager of the employee?",
+          choices: employeeArr,
+        },
+      ];
+
+      inquirer.prompt(addEmployeeQuestions).then((newEmployeeAnswers) => {
+        // console.log(newEmployeeAnswers);
+        const sqlQuery =
+          "INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)";
+        const params = [
+          newEmployeeAnswers.firstName,
+          newEmployeeAnswers.lastName,
+          newEmployeeAnswers.roleId,
+          newEmployeeAnswers.managerId,
+        ];
+        db.query(sqlQuery, params, function (err, results) {
+          if (err) {
+            console.log("Failed to add new employee to DB");
+          } else {
+            console.log("New Employee added");
+          }
+          askUserAction();
+        });
+      });
+    });
+  });
+}
+
+function updateEmployeeRole() {
   // get all emplyees and create array for user view
   var employeeArr;
   db.query("SELECT id, first_name, last_name FROM employees", function (err, results) {
@@ -152,7 +220,7 @@ async function updateEmployeeRole() {
 
       //console.log(employeeArr);
       console.log(rolesArr);
-      const EMPLOYEE_UPDATE_QUESTIONS = [
+      const employeeUpdateQuestions = [
         {
           type: "list",
           // emplyee id
@@ -168,7 +236,7 @@ async function updateEmployeeRole() {
           choices: rolesArr,
         },
       ];
-      inquirer.prompt(EMPLOYEE_UPDATE_QUESTIONS).then((updateAnswers) => {
+      inquirer.prompt(employeeUpdateQuestions).then((updateAnswers) => {
         console.log(updateAnswers.employeeId);
         console.log(updateAnswers.roleId);
 
@@ -215,6 +283,7 @@ async function askUserAction() {
         addADepartment();
         break;
       case "Add An Employee":
+        addAnEmployee();
         break;
       case "View All Employees":
         getAllEmployees();
@@ -232,5 +301,3 @@ async function askUserAction() {
 /** Main Function
  *************************************************************************************************/
 init();
-
-//department.getAllDepartments();
