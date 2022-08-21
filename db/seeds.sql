@@ -12,7 +12,8 @@ VALUES
   ('Engineer Manager', 160000, 4),
   ('HR Admin', 75000, 2),
   ('Sales Manager', 120000, 1),
-  ('Accountant', 150000, 3);
+  ('Accountant', 150000, 3),
+  ('Tester', 110000, 4);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUES
